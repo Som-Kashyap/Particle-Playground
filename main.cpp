@@ -37,9 +37,26 @@ void Particle::update(float& deltaTime, float& gravity) {
 
 	lifeTime += deltaTime;
 
+	if (lifeTime >= 1.5f && lifeTime < 3.f) {
+		float opacity = particleShape.getFillColor().a;
+		opacity -= deltaTime;
+		if (opacity < 0) {
+			opacity = 255;
+			opacity -= 100*deltaTime;
+			float radius = particleShape.getRadius();
+			radius *= 1.5f;
+			if (radius >= 20.f) radius = 20.f;
+			particleShape.setRadius(radius);
+		}
+		sf::Color color = particleShape.getFillColor();
+		color.a = opacity;
+		particleShape.setFillColor(color);
+	}
 	if (lifeTime >= 3.f) {
+		lifeTime = 0.f;
 		draw = false;
 	}
+	
 	particleShape.move(velocity*deltaTime);
 
 }
