@@ -8,7 +8,9 @@ using namespace std;
 enum class particleType {
 
 	magical,
-	freeFall
+	freeFall,
+	followers,
+	wave
 };
 
 class Particle {
@@ -37,8 +39,7 @@ Particle::Particle() {
 
 void Particle::update(float& deltaTime, float& gravity, particleType& type) {
 
-	//velocity.x += acceleration.x*deltaTime;
-	//velocity.y += acceleration.y*deltaTime;
+	
 	//velocity.y += gravity * deltaTime;
 
 	lifeTime += deltaTime;
@@ -66,6 +67,12 @@ void Particle::update(float& deltaTime, float& gravity, particleType& type) {
 
 	if (type == particleType::freeFall) {
 		particleShape.setFillColor(sf::Color::Cyan);
+	}
+
+	if (type == particleType::followers || type == particleType::wave) {
+		acceleration = sf::Vector2f( 400,  400);
+		velocity.x += acceleration.x * deltaTime;
+		velocity.y += acceleration.y * deltaTime;
 	}
 	
 	particleShape.move(velocity*deltaTime);
@@ -136,11 +143,6 @@ void Game::handleEvents() {
 
 			Particle particleOBJ;
 			sf::Vector2f mousepos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-			glowCentre.setPosition(mousepos);
-			circleOne.setPosition(mousepos);
-			circleTwo.setPosition(mousepos);
-			circleThree.setPosition(mousepos);
-			circleFour.setPosition(mousepos);
 			particleOBJ.particleShape.setPosition(mousepos);
 			particleVector.emplace_back(particleOBJ);
 		}
@@ -148,11 +150,24 @@ void Game::handleEvents() {
 			isEmitting = false;
 		}
 
+		if (type == particleType::freeFall) {
+			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::RControl) {
+				gravity += 10;
+				cout << "Gravity: " << gravity << " px/s*s" << endl;
+			}
+		}
+
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter) {
 			if (type == particleType::magical) {
 				type = particleType::freeFall;
 			}
 			else if (type == particleType::freeFall) {
+				type = particleType::followers;
+			}
+			else if (type == particleType::followers) {
+				type = particleType::wave;
+			}
+			else if (type == particleType::wave) {
 				type = particleType::magical;
 			}
 		}
@@ -161,6 +176,13 @@ void Game::handleEvents() {
 }
 
 void Game::update() {
+
+	sf::Vector2f mousepos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+	glowCentre.setPosition(mousepos);
+	circleOne.setPosition(mousepos);
+	circleTwo.setPosition(mousepos);
+	circleThree.setPosition(mousepos);
+	circleFour.setPosition(mousepos);
 
 	for (auto& particle : particleVector) {
 		particle.update(deltaTime,gravity,type);
@@ -207,6 +229,18 @@ void Game::update() {
 
 	}
 
+	if (type == particleType::followers) {
+		for (size_t i = 0; i < particleVector.size(); i++) {
+
+			if (particleVector[i].particleShape.getPosition().x < mousepos.x) {
+				particleVector[i].particleShape.move(particleVector[i].velocity.x, particleVector[i].velocity.y);
+			}
+			else if (particleVector[i].particleShape.getPosition().x > mousepos.x) {
+				particleVector[i].particleShape.move(-particleVector[i].velocity.x, particleVector[i].velocity.y);
+			}
+		}
+	}
+
 	//if (isEmitting) {
 	//	blinkTimer += deltaTime;
 	//	if (blinkTimer >= 0.1) {
@@ -229,13 +263,12 @@ void Game::render() {
 	for (auto& particle : particleVector) {
 		if(particle.draw) window.draw(particle.particleShape);
 	}
-	if (isEmitting) {
 		window.draw(circleFour);
 		window.draw(circleThree);
 		window.draw(circleTwo);
 		window.draw(circleOne);
 		window.draw(glowCentre);
-	}
+	
 	window.display();
 }
 
