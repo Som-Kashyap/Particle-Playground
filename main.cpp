@@ -5,6 +5,12 @@
 
 using namespace std;
 
+enum class particleType {
+
+	magical,
+	freeFall
+};
+
 class Particle {
 
 public:
@@ -17,7 +23,7 @@ public:
 	float lifeTime = 0.f;
 	bool draw = true;
 
-	void update(float& deltaTime , float& gravity);
+	void update(float& deltaTime , float& gravity, particleType& type);
 };
 
 Particle::Particle() {
@@ -29,7 +35,7 @@ Particle::Particle() {
 
 }
 
-void Particle::update(float& deltaTime, float& gravity) {
+void Particle::update(float& deltaTime, float& gravity, particleType& type) {
 
 	//velocity.x += acceleration.x*deltaTime;
 	//velocity.y += acceleration.y*deltaTime;
@@ -37,24 +43,29 @@ void Particle::update(float& deltaTime, float& gravity) {
 
 	lifeTime += deltaTime;
 
-	if (lifeTime >= 1.5f && lifeTime < 3.f) {
-		float opacity = particleShape.getFillColor().a;
-		opacity -= deltaTime;
-		if (opacity < 0) {
-			opacity = 255;
-			opacity -= 100*deltaTime;
-			float radius = particleShape.getRadius();
-			radius *= 1.5f;
-			if (radius >= 20.f) radius = 20.f;
-			particleShape.setRadius(radius);
+	if (type == particleType::magical) {
+		if (lifeTime >= 1.5f && lifeTime < 3.f) {
+			float opacity = particleShape.getFillColor().a;
+			opacity -= deltaTime;
+			if (opacity < 0) {
+				opacity = 255;
+				float radius = particleShape.getRadius();
+				radius *= 1.5f;
+				if (radius >= 20.f) radius = 20.f;
+				particleShape.setRadius(radius);
+			}
+			sf::Color color = particleShape.getFillColor();
+			color.a = opacity;
+			particleShape.setFillColor(color);
 		}
-		sf::Color color = particleShape.getFillColor();
-		color.a = opacity;
-		particleShape.setFillColor(color);
+		if (lifeTime >= 3.f) {
+			lifeTime = 0.f;
+			draw = false;
+		}
 	}
-	if (lifeTime >= 3.f) {
-		lifeTime = 0.f;
-		draw = false;
+
+	if (type == particleType::freeFall) {
+		particleShape.setFillColor(sf::Color::Cyan);
 	}
 	
 	particleShape.move(velocity*deltaTime);
@@ -78,6 +89,7 @@ public:
 	float blinkTimer = 0.f;
 
 	Game();
+	particleType type;
 
 	void update();
 	void handleEvents();
@@ -88,6 +100,8 @@ public:
 };
 
 Game::Game() : window(sf::VideoMode(800, 600), "Particle Generator") {
+
+	type = particleType::magical;
 
 	glowCentre.setRadius(3.f);
 	glowCentre.setFillColor(sf::Color(255,255,255,255));
@@ -134,6 +148,14 @@ void Game::handleEvents() {
 			isEmitting = false;
 		}
 
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter) {
+			if (type == particleType::magical) {
+				type = particleType::freeFall;
+			}
+			else if (type == particleType::freeFall) {
+				type = particleType::magical;
+			}
+		}
 
 	}
 }
@@ -141,7 +163,7 @@ void Game::handleEvents() {
 void Game::update() {
 
 	for (auto& particle : particleVector) {
-		particle.update(deltaTime,gravity);
+		particle.update(deltaTime,gravity,type);
 	}
 
 	for (size_t i = 0; i < particleVector.size(); i++) {
@@ -154,17 +176,35 @@ void Game::update() {
 		}
 	}
 
-	for (size_t i = 0; i < particleVector.size(); i++) {
-		particleVector[i].acceleration.x += (rand() % 100) - 50;
-		particleVector[i].acceleration.y += (rand() % 100) - 50;
-		particleVector[i].velocity.x += particleVector[i].acceleration.x * deltaTime;
-		particleVector[i].velocity.y += particleVector[i].acceleration.y * deltaTime;
-		if (particleVector[i].velocity.x > particleVector[i].maxVelocity.x) {
-			particleVector[i].velocity.x = particleVector[i].maxVelocity.x;
+	if (type == particleType::magical) {
+		for (size_t i = 0; i < particleVector.size(); i++) {
+			particleVector[i].acceleration.x += (rand() % 100) - 50;
+			particleVector[i].acceleration.y += (rand() % 100) - 50;
+			particleVector[i].velocity.x += particleVector[i].acceleration.x * deltaTime;
+			particleVector[i].velocity.y += particleVector[i].acceleration.y * deltaTime;
+			if (particleVector[i].velocity.x > particleVector[i].maxVelocity.x) {
+				particleVector[i].velocity.x = particleVector[i].maxVelocity.x;
+			}
+			if (particleVector[i].velocity.y > particleVector[i].maxVelocity.y) {
+				particleVector[i].velocity.y = particleVector[i].maxVelocity.y;
+			}
 		}
-		if (particleVector[i].velocity.y > particleVector[i].maxVelocity.y) {
-			particleVector[i].velocity.y = particleVector[i].maxVelocity.y;
+	}
+
+	if (type == particleType::freeFall) {
+		for (size_t i = 0; i < particleVector.size(); i++) {
+
+			if (particleVector[i].particleShape.getPosition().y >= window.getSize().y) {
+				particleVector[i].particleShape.setPosition(particleVector[i].particleShape.getPosition().x, window.getSize().y - particleVector[i].particleShape.getScale().y);
+				particleVector[i].velocity.y = 0;
+			}
+			if (particleVector[i].particleShape.getPosition().x <= 0 || particleVector[i].particleShape.getPosition().x >= window.getSize().x) {
+				particleVector[i].velocity.x = 0;
+			}
+
+			particleVector[i].velocity.y += gravity * deltaTime;
 		}
+
 	}
 
 	//if (isEmitting) {
