@@ -25,6 +25,8 @@ public:
 	sf::Vector2f maxVelocity = (sf::Vector2f(800.f, 500.f));
 	sf::Vector2f acceleration;
 	vector<sf::Color>magicalPalette = { sf::Color(224,63,216,rand()%121+50) , sf::Color(255, 192, 203,rand() % 121 + 50) , sf::Color(0, 255, 255,rand() % 121 + 50)};
+	vector<sf::Color>constrainedPalette = { sf::Color(0,0,255,rand() % 121 + 50), sf::Color(173, 216, 230,rand() % 121 + 50), sf::Color(255,255,255,rand() % 121 + 50)};
+	vector<sf::Color>wavePalette = { sf::Color(255, 165, 0,rand() % 121 + 50),sf::Color(255, 255, 0,rand() % 121 + 50),sf::Color(255,0,0,rand() % 121 + 50) };
 
 	float particleRadius = 2.f;
 	
@@ -37,10 +39,10 @@ public:
 Particle::Particle(Text& radiusText) {
 
 	particleShape.setRadius(particleRadius);
-	particleShape.setFillColor(magicalPalette[rand() % 3]);
 	velocity = sf::Vector2f(0.f, 0.f);
 	radiusText.toString("Radius: " + to_string(particleRadius));
 
+	
 }
 
 void Particle::update(float& deltaTime, float& gravity, particleType& type) {
@@ -51,6 +53,8 @@ void Particle::update(float& deltaTime, float& gravity, particleType& type) {
 	lifeTime += deltaTime;
 
 	if (type == particleType::magical) {
+
+		particleShape.setFillColor(magicalPalette[rand() % 3]);
 
 		if (lifeTime >= 1.5f && lifeTime < 3.f) {
 			float opacity = particleShape.getFillColor().a;
@@ -77,12 +81,39 @@ void Particle::update(float& deltaTime, float& gravity, particleType& type) {
 		particleShape.setFillColor(sf::Color::Cyan);
 	}
 
-	if (type == particleType::followers || type == particleType::wave) {
-		acceleration = sf::Vector2f( rand()%400,  rand()%400);
+	if (type == particleType::followers) {
+		particleShape.setFillColor(constrainedPalette[rand() % 3]);
+	}
+
+	if (type == particleType::followers) {
+		acceleration = sf::Vector2f(rand()%400, rand() % 400);
 		velocity.x += acceleration.x * deltaTime;
 		velocity.y += acceleration.y * deltaTime;
 	}
 	
+	if (type == particleType::wave) {
+
+		acceleration = sf::Vector2f(rand() % 101 + 100, rand() % 101 + 100);
+		velocity.x += acceleration.x * deltaTime;
+		velocity.y += acceleration.y * deltaTime;
+		particleShape.setFillColor(wavePalette[rand() % 3]);
+
+		if (lifeTime > 3 && lifeTime < 6) {
+			sf::Color color = particleShape.getFillColor();
+			float opacity = color.a;
+			if (opacity < 200) {
+				opacity = 200;
+			}
+			else opacity = rand() % 121 + 50;
+
+			particleShape.setFillColor(color);
+		}
+
+		if (lifeTime >= 6) {
+			lifeTime = 0.f;
+			draw = false;
+		}
+	}
 	particleShape.move(velocity*deltaTime);
 
 }
@@ -99,6 +130,7 @@ public:
 	sf::CircleShape circleFour;
 	sf::Clock deltaTimeClock;
 	float deltaTime = 0.f;
+	float FPS = 0.f;
 	float gravity = 980.f;
 	float format = ("{:.2f}", gravity);
 
@@ -112,6 +144,8 @@ public:
 	Text radiusText;
 	Text gravityText;
 	Text clearText;
+	Text sizeText;
+	Text FPStext;
 
 	void update();
 	void handleEvents();
@@ -122,6 +156,10 @@ public:
 };
 
 Game::Game() : window(sf::VideoMode(800, 600), "Particle Generator") {
+
+	window.setFramerateLimit(60);
+
+	particleVector.reserve(20000);
 
 	type = particleType::magical;
 
@@ -151,6 +189,8 @@ Game::Game() : window(sf::VideoMode(800, 600), "Particle Generator") {
 	radiusText.addDetails("Radius: ", "resources/arial.ttf", 15, sf::Color::White, sf::Vector2f(10., 30.));
 	gravityText.addDetails("Gravity: " + to_string((int)gravity), "resources/arial.ttf", 15, sf::Color::White, sf::Vector2f(10., 50.));
 	clearText.addDetails("Clear!(NUM0) " , "resources/arial.ttf", 15, sf::Color::White, sf::Vector2f(10., 70.));
+	sizeText.addDetails("Particles: ", "resources/arial.ttf", 15, sf::Color::White, sf::Vector2f(10., 90.));
+	FPStext.addDetails("FPS: ", "resources/arial.ttf", 15, sf::Color::White, sf::Vector2f(10., 110.));
 }
 
 void Game::handleEvents() {
@@ -166,13 +206,24 @@ void Game::handleEvents() {
 
 			isEmitting = true;
 
-			for (size_t i = 0; i < 50; i++) {
-				Particle particleOBJ(radiusText);
-				sf::Vector2f mousepos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-				particleOBJ.particleShape.setPosition(mousepos);
-				particleVector.emplace_back(particleOBJ);
+			if (type != particleType::freeFall) {
+				for (size_t i = 0; i < 100; i++) {
+					Particle particleOBJ(radiusText);
+					sf::Vector2f mousepos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+					particleOBJ.particleShape.setPosition(mousepos);
+					particleVector.emplace_back(particleOBJ);
+				}
 			}
-			
+			else {
+					Particle particleOBJ(radiusText);
+					sf::Vector2f mousepos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+					particleOBJ.particleShape.setPosition(mousepos);
+					particleVector.emplace_back(particleOBJ);
+				
+			}
+
+			sizeText.toString("Particles: " + to_string(particleVector.size()));
+					
 		}
 		else {
 			isEmitting = false;
@@ -194,18 +245,22 @@ void Game::handleEvents() {
 			if (type == particleType::magical) {
 				type = particleType::freeFall;
 				stateText.toString("Mode: Free Fall");
+				particleVector.clear();
 			}
 			else if (type == particleType::freeFall) {
 				type = particleType::followers;
 				stateText.toString("Mode: Followers");
+				particleVector.clear();
 			}
 			else if (type == particleType::followers) {
 				type = particleType::wave;
 				stateText.toString("Mode: Wave");
+				particleVector.clear();
 			}
 			else if (type == particleType::wave) {
 				type = particleType::magical;
 				stateText.toString("Mode: Magical");
+				particleVector.clear();
 			}
 		}
 
@@ -315,6 +370,8 @@ void Game::render() {
 		window.draw(gravityText.getText());
 	}
 		window.draw(HUD);
+		window.draw(FPStext.getText());
+		window.draw(sizeText.getText());
 		window.draw(clearText.getText());
 		window.draw(stateText.getText());
 		window.draw(radiusText.getText());
@@ -332,6 +389,8 @@ void Game::run() {
 	while (window.isOpen()) {
 
 		deltaTime = deltaTimeClock.restart().asSeconds();
+		FPS = 1.f / deltaTime;
+		FPStext.toString("FPS: " + to_string(FPS));
 
 		update();
 		handleEvents();
