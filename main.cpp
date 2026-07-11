@@ -28,7 +28,7 @@ public:
 	vector<sf::Color>constrainedPalette = { sf::Color(0,0,255,rand() % 121 + 50), sf::Color(173, 216, 230,rand() % 121 + 50), sf::Color(255,255,255,rand() % 121 + 50)};
 	vector<sf::Color>wavePalette = { sf::Color(255, 165, 0,rand() % 121 + 50),sf::Color(255, 255, 0,rand() % 121 + 50),sf::Color(255,0,0,rand() % 121 + 50) };
 
-	float particleRadius = 2.f;
+	float particleRadius = 10.f;
 	
 	float lifeTime = 0.f;
 	bool draw = true;
@@ -112,6 +112,7 @@ void Particle::update(float& deltaTime, float& gravity, particleType& type) {
 		if (lifeTime >= 6) {
 			lifeTime = 0.f;
 			draw = false;
+
 		}
 	}
 	particleShape.move(velocity*deltaTime);
@@ -136,6 +137,8 @@ public:
 
 	bool isEmitting = false;
 	float blinkTimer = 0.f;
+	
+	vector<Particle>particleVector;
 
 	Game();
 	particleType type;
@@ -152,7 +155,7 @@ public:
 	void render();
 	void run();
 
-	vector<Particle>particleVector;
+	
 };
 
 Game::Game() : window(sf::VideoMode(800, 600), "Particle Generator") {
