@@ -2,6 +2,7 @@
 #include "Text.h"
 #include <iostream>
 #include <format>
+#include <vector>
 #include <ctime>
 #include <cstdlib>
 
@@ -23,6 +24,7 @@ public:
 	sf::Vector2f velocity;
 	sf::Vector2f maxVelocity = (sf::Vector2f(800.f, 500.f));
 	sf::Vector2f acceleration;
+	vector<sf::Color>magicalPalette = { sf::Color(224,63,216,rand()%121+50) , sf::Color(255, 192, 203,rand() % 121 + 50) , sf::Color(0, 255, 255,rand() % 121 + 50)};
 
 	float particleRadius = 2.f;
 	
@@ -35,7 +37,7 @@ public:
 Particle::Particle(Text& radiusText) {
 
 	particleShape.setRadius(particleRadius);
-	particleShape.setFillColor(sf::Color(rand() % 256, rand() % 256, rand() % 256));
+	particleShape.setFillColor(magicalPalette[rand() % 3]);
 	velocity = sf::Vector2f(0.f, 0.f);
 	radiusText.toString("Radius: " + to_string(particleRadius));
 
@@ -50,7 +52,6 @@ void Particle::update(float& deltaTime, float& gravity, particleType& type) {
 
 	if (type == particleType::magical) {
 
-
 		if (lifeTime >= 1.5f && lifeTime < 3.f) {
 			float opacity = particleShape.getFillColor().a;
 			opacity -= deltaTime;
@@ -64,7 +65,8 @@ void Particle::update(float& deltaTime, float& gravity, particleType& type) {
 			sf::Color color = particleShape.getFillColor();
 			color.a = opacity;
 			particleShape.setFillColor(color);
-		}
+	}
+
 		if (lifeTime >= 3.f) {
 			lifeTime = 0.f;
 			draw = false;
@@ -164,7 +166,7 @@ void Game::handleEvents() {
 
 			isEmitting = true;
 
-			for (size_t i = 0; i < 10; i++) {
+			for (size_t i = 0; i < 50; i++) {
 				Particle particleOBJ(radiusText);
 				sf::Vector2f mousepos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 				particleOBJ.particleShape.setPosition(mousepos);
@@ -235,6 +237,7 @@ void Game::update() {
 
 	if (type == particleType::magical) {
 		for (size_t i = 0; i < particleVector.size(); i++) {
+
 			particleVector[i].acceleration.x += (rand() % 100) - 50;
 			particleVector[i].acceleration.y += (rand() % 100) - 50;
 			particleVector[i].velocity.x += particleVector[i].acceleration.x * deltaTime;
