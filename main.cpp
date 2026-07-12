@@ -12,7 +12,7 @@ enum class particleType {
 
 	magical,
 	freeFall,
-	followers,
+	constrained,
 	wave
 };
 
@@ -78,11 +78,11 @@ void Particle::update(float& deltaTime, float& gravity, particleType& type) {
 		particleShape.setFillColor(sf::Color::Cyan);
 	}
 
-	if (type == particleType::followers) {
+	if (type == particleType::constrained) {
 		particleShape.setFillColor(constrainedPalette[rand() % 3]);
 	}
 
-	if (type == particleType::followers) {
+	if (type == particleType::constrained) {
 		acceleration = sf::Vector2f(rand()%400, rand() % 400);
 		velocity.x += acceleration.x * deltaTime;
 		velocity.y += acceleration.y * deltaTime;
@@ -131,6 +131,7 @@ public:
 	sf::CircleShape circleTwo;
 	sf::CircleShape circleThree;
 	sf::CircleShape circleFour;
+	sf::CircleShape outerCircle;
 	sf::Clock deltaTimeClock;
 	float deltaTime = 0.f;
 	float FPS = 0.f;
@@ -177,17 +178,21 @@ Game::Game() : window(sf::VideoMode(800, 600), "Particle Generator") {
 	glowCentre.setFillColor(sf::Color(255,255,255,255));
 	glowCentre.setOrigin(glowCentre.getRadius(),glowCentre.getRadius());
 	circleOne.setRadius(5.f);
-	circleOne.setFillColor(sf::Color(255, 255, 255, 160));
+	circleOne.setFillColor(sf::Color(255, 255, 255, 150));
 	circleOne.setOrigin(circleOne.getRadius(), circleOne.getRadius());
-	circleTwo.setRadius(7.f);
-	circleTwo.setFillColor(sf::Color(255, 255, 255, 120));
+	circleTwo.setRadius(8.f);
+	circleTwo.setFillColor(sf::Color(255, 255, 255, 50));
 	circleTwo.setOrigin(circleTwo.getRadius(), circleTwo.getRadius());
-	circleThree.setRadius(11.f);
-	circleThree.setFillColor(sf::Color(255, 255, 255, 80));
+	circleThree.setRadius(12.f);
+	circleThree.setFillColor(sf::Color(255, 255, 255, 40));
 	circleThree.setOrigin(circleThree.getRadius(), circleThree.getRadius());
-	circleFour.setRadius(15.f);
-	circleFour.setFillColor(sf::Color(255, 255, 255, 40));
+	circleFour.setRadius(25.f);
+	circleFour.setFillColor(sf::Color(255, 255, 255, 30));
 	circleFour.setOrigin(circleFour.getRadius(), circleFour.getRadius());
+	outerCircle.setRadius(50.f);
+	outerCircle.setFillColor(sf::Color(255, 255, 255, 20));
+	outerCircle.setOrigin(outerCircle.getRadius(), outerCircle.getRadius());
+
 	window.setMouseCursorVisible(false);
 
 	stateText.addDetails("Mode: Magical","resources/arial.ttf", 15 , sf::Color::White,sf::Vector2f(10., 10.));
@@ -232,6 +237,7 @@ void Game::handleEvents() {
 		}
 		else {
 			isEmitting = false;
+
 		}
 
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Num0) {
@@ -255,12 +261,12 @@ void Game::handleEvents() {
 				sizeText.toString("Particles: " + to_string(particleVector.size()));
 			}
 			else if (type == particleType::freeFall) {
-				type = particleType::followers;
-				stateText.toString("Mode: Followers");
+				type = particleType::constrained;
+				stateText.toString("Mode: Constrained");
 				particleVector.clear();
 				sizeText.toString("Particles: " + to_string(particleVector.size()));
 			}
-			else if (type == particleType::followers) {
+			else if (type == particleType::constrained) {
 				type = particleType::wave;
 				stateText.toString("Mode: Wave");
 				particleVector.clear();
@@ -285,6 +291,7 @@ void Game::update() {
 	circleTwo.setPosition(mousepos);
 	circleThree.setPosition(mousepos);
 	circleFour.setPosition(mousepos);
+	outerCircle.setPosition(mousepos);
 
 	for (auto& particle : particleVector) {
 		particle.update(deltaTime,gravity,type);
@@ -332,7 +339,7 @@ void Game::update() {
 
 	}
 
-	if (type == particleType::followers) {
+	if (type == particleType::constrained) {
 		for (size_t i = 0; i < particleVector.size(); i++) {
 
 			if (particleVector[i].particleShape.getPosition().x < window.getSize().x && particleVector[i].particleShape.getPosition().x >= 0 && particleVector[i].particleShape.getPosition().y >= 0 && particleVector[i].particleShape.getPosition().y < window.getSize().y) {
@@ -385,6 +392,7 @@ void Game::render() {
 		window.draw(clearText.getText());
 		window.draw(stateText.getText());
 		window.draw(radiusText.getText());
+		window.draw(outerCircle);
 		window.draw(circleFour);
 		window.draw(circleThree);
 		window.draw(circleTwo);
