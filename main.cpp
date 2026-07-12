@@ -48,7 +48,6 @@ Particle::Particle(Text& radiusText, particleType& type) {
 	velocity = sf::Vector2f(0.f, 0.f);
 	radiusText.toString("Radius: " + to_string(low) + " to " + to_string(high+low) + " px");
 
-	if ( type == particleType::magical ) particleShape.setFillColor(magicalPalette[rand() % 3]);
 	
 }
 
@@ -61,7 +60,7 @@ void Particle::update(float& deltaTime, float& gravity, particleType& type) {
 
 	if (type == particleType::magical) {
 
-		
+		particleShape.setFillColor(magicalPalette[rand() % 3]);
 
 		if (lifeTime >= 1.5f && lifeTime < 3.f) {
 			float radius = particleShape.getRadius();
