@@ -36,7 +36,7 @@ public:
 	int low;
 	int high;
 
-	void update(float& deltaTime , float& gravity, particleType& type);
+	void update(float& deltaTime , float& gravity, particleType& type, bool& toggleGravity);
 };
 
 Particle::Particle(Text& radiusText, particleType& type) {
@@ -51,7 +51,7 @@ Particle::Particle(Text& radiusText, particleType& type) {
 	
 }
 
-void Particle::update(float& deltaTime, float& gravity, particleType& type) {
+void Particle::update(float& deltaTime, float& gravity, particleType& type, bool& toggleGravity) {
 
 	
 	//velocity.y += gravity * deltaTime;
@@ -61,6 +61,10 @@ void Particle::update(float& deltaTime, float& gravity, particleType& type) {
 	if (type == particleType::magical) {
 
 		particleShape.setFillColor(magicalPalette[rand() % 3]);
+
+		if (toggleGravity) {
+			velocity.y += gravity * deltaTime;
+		}
 
 		if (lifeTime >= 1.5f && lifeTime < 3.f) {
 			float radius = particleShape.getRadius();
@@ -141,6 +145,7 @@ public:
 	float format = ("{:.2f}", gravity);
 
 	bool showControls = false;
+	bool toggleGravity = false;
 	bool isEmitting = false;
 	float blinkTimer = 0.f;
 	
@@ -321,6 +326,9 @@ void Game::handleEvents() {
 			else showControls = false;
 		}
 		
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::G) {
+			toggleGravity = !toggleGravity;
+		}
 	}
 }
 
@@ -335,7 +343,7 @@ void Game::update() {
 	outerCircle.setPosition(mousepos);
 
 	for (auto& particle : particleVector) {
-		particle.update(deltaTime,gravity,type);
+		particle.update(deltaTime,gravity,type,toggleGravity);
 	}
 
 	for (size_t i = 0; i < particleVector.size(); i++) {
