@@ -126,6 +126,7 @@ class Game {
 public:
 	sf::RenderWindow window;
 	sf::RectangleShape HUD;
+	sf::RectangleShape controlsDisplay;
 	sf::CircleShape glowCentre;
 	sf::CircleShape circleOne;
 	sf::CircleShape circleTwo;
@@ -139,6 +140,7 @@ public:
 	float gravity = 980.f;
 	float format = ("{:.2f}", gravity);
 
+	bool showControls = false;
 	bool isEmitting = false;
 	float blinkTimer = 0.f;
 	
@@ -176,6 +178,12 @@ Game::Game() : window(sf::VideoMode(800, 600), "Particle Generator") {
 	sf::Color HUDcolor = sf::Color::Red;
 	HUDcolor.a = 100.f;
 	HUD.setFillColor(HUDcolor);
+
+	controlsDisplay.setSize(sf::Vector2f(400.f, 400.f));
+	sf::Color controlsDisplayColor = sf::Color::Blue;
+	controlsDisplayColor.a = 200.f;
+	controlsDisplay.setFillColor(controlsDisplayColor);
+	controlsDisplay.setPosition(window.getSize().x/2 - controlsDisplay.getSize().x/2, window.getSize().y/2 - controlsDisplay.getSize().y/2);
 
 	glowCentre.setRadius(3.f);
 	glowCentre.setFillColor(sf::Color(255,255,255,255));
@@ -295,6 +303,12 @@ void Game::handleEvents() {
 			}
 			spawnCountText.toString("Spawn Count: " + to_string(spawnCount));
 		}
+
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::H) {
+			if (!showControls) showControls = true;
+			else showControls = false;
+		}
+		
 	}
 }
 
@@ -402,6 +416,8 @@ void Game::render() {
 	if (type == particleType::freeFall) {
 		window.draw(gravityText.getText());
 	}
+
+	if (showControls) window.draw(controlsDisplay);
 		
 		window.draw(HUD);
 		window.draw(spawnCountText.getText());
