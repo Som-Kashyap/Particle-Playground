@@ -160,6 +160,7 @@ public:
 	Text spawnHelpText;
 	Text modeHelpText;
 	Text clearHelpText;
+	Text controlsHelpText;
 
 	void update();
 	void handleEvents();
@@ -218,6 +219,7 @@ Game::Game() : window(sf::VideoMode(800, 600), "Particle Generator") {
 	spawnHelpText.addDetails("Increase Spawn-Rate: Up \nDecrease Spawn-Rate: Down ", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 160.));
 	modeHelpText.addDetails("....Modes.... \nMagical: 1\nFree Fall: 2\nConstrained: 3\nWave: 4", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 20.));
 	clearHelpText.addDetails("Clear Particles: C","resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 210.));
+	controlsHelpText.addDetails("Emit Particles: LCtrl", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 240.));
 }
 
 void Game::handleEvents() {
@@ -428,6 +430,7 @@ void Game::render() {
 		window.draw(spawnHelpText.getText());
 		window.draw(modeHelpText.getText());
 		window.draw(clearHelpText.getText());
+		window.draw(controlsHelpText.getText());
 	}
 		
 		window.draw(HUD);
