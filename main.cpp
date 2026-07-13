@@ -161,6 +161,8 @@ public:
 	Text modeHelpText;
 	Text clearHelpText;
 	Text controlsHelpText;
+	Text helpText;
+	Text gravityHelpText;
 
 	void update();
 	void handleEvents();
@@ -220,6 +222,8 @@ Game::Game() : window(sf::VideoMode(800, 600), "Particle Generator") {
 	modeHelpText.addDetails("....Modes.... \nMagical: 1\nFree Fall: 2\nConstrained: 3\nWave: 4", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 20.));
 	clearHelpText.addDetails("Clear Particles: C","resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 210.));
 	controlsHelpText.addDetails("Emit Particles: LCtrl", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 240.));
+	helpText.addDetails("Toggle Help: H", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 270.));
+	gravityHelpText.addDetails("Toggle Gravity: G", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 300.));
 }
 
 void Game::handleEvents() {
@@ -431,6 +435,8 @@ void Game::render() {
 		window.draw(modeHelpText.getText());
 		window.draw(clearHelpText.getText());
 		window.draw(controlsHelpText.getText());
+		window.draw(helpText.getText());
+		window.draw(gravityHelpText.getText());
 	}
 		
 		window.draw(HUD);
