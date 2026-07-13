@@ -158,6 +158,10 @@ public:
 	Text FPStext;
 	Text spawnCountText;
 
+	Text spawnHelpText;
+	Text modeHelpText;
+
+
 	void update();
 	void handleEvents();
 	void render();
@@ -213,6 +217,8 @@ Game::Game() : window(sf::VideoMode(800, 600), "Particle Generator") {
 	sizeText.addDetails("Particles: 0", "resources/arial.ttf", 15, sf::Color::White, sf::Vector2f(10., 90.));
 	FPStext.addDetails("FPS: ", "resources/arial.ttf", 15, sf::Color::White, sf::Vector2f(10., 110.));
 	spawnCountText.addDetails("Spawn Count: 100 ", "resources/arial.ttf", 15, sf::Color::White, sf::Vector2f(10., 130.));
+	spawnHelpText.addDetails("Increase Spawn-Rate: Up \nDecrease Spawn-Rate: Down ", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 140.));
+	modeHelpText.addDetails("....Modes.... \nMagical: 1\nFree Fall: 2\nConstrained: 3\nWave: 4", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 20.));
 }
 
 void Game::handleEvents() {
@@ -417,7 +423,11 @@ void Game::render() {
 		window.draw(gravityText.getText());
 	}
 
-	if (showControls) window.draw(controlsDisplay);
+	if (showControls) {
+		window.draw(controlsDisplay);
+		window.draw(spawnHelpText.getText());
+		window.draw(modeHelpText.getText());
+	}
 		
 		window.draw(HUD);
 		window.draw(spawnCountText.getText());
