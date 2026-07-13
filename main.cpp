@@ -84,12 +84,16 @@ void Particle::update(float& deltaTime, float& gravity, particleType& type, bool
 
 	if (type == particleType::constrained) {
 		particleShape.setFillColor(constrainedPalette[rand() % 3]);
+
 	}
 
 	if (type == particleType::constrained) {
 		acceleration = sf::Vector2f(rand()%400, rand() % 400);
 		velocity.x += acceleration.x * deltaTime;
 		velocity.y += acceleration.y * deltaTime;
+		if (toggleGravity) {
+			velocity.y += gravity * deltaTime;
+		}
 		if (lifeTime >= 3) {
 			lifeTime = 0.f;
 			draw = false;
@@ -103,6 +107,10 @@ void Particle::update(float& deltaTime, float& gravity, particleType& type, bool
 		velocity.x += acceleration.x * deltaTime;
 		velocity.y += acceleration.y * deltaTime;
 		particleShape.setFillColor(wavePalette[rand() % 3]);
+
+		if (toggleGravity) {
+			velocity.y += gravity * deltaTime;
+		}
 
 		if (lifeTime > 3 && lifeTime < 6) {
 			sf::Color color = particleShape.getFillColor();
@@ -161,6 +169,7 @@ public:
 	Text sizeText;
 	Text FPStext;
 	Text spawnCountText;
+	Text gravityStatusText;
 
 	Text spawnHelpText;
 	Text modeHelpText;
@@ -187,12 +196,12 @@ Game::Game() : window(sf::VideoMode(800, 600), "Particle Generator") {
 
 	HUD.setSize(sf::Vector2f(150.f, 180.f));
 	sf::Color HUDcolor = sf::Color::Red;
-	HUDcolor.a = 100.f;
+	HUDcolor.a = 50.f;
 	HUD.setFillColor(HUDcolor);
 
 	controlsDisplay.setSize(sf::Vector2f(400.f, 400.f));
 	sf::Color controlsDisplayColor = sf::Color::Blue;
-	controlsDisplayColor.a = 200.f;
+	controlsDisplayColor.a = 50.f;
 	controlsDisplay.setFillColor(controlsDisplayColor);
 	controlsDisplay.setPosition(window.getSize().x/2 - controlsDisplay.getSize().x/2, window.getSize().y/2 - controlsDisplay.getSize().y/2);
 
@@ -219,10 +228,12 @@ Game::Game() : window(sf::VideoMode(800, 600), "Particle Generator") {
 
 	stateText.addDetails("Mode: Magical","resources/arial.ttf", 15 , sf::Color::White,sf::Vector2f(10., 10.));
 	radiusText.addDetails("Radius: ", "resources/arial.ttf", 15, sf::Color::White, sf::Vector2f(10., 30.));
-	gravityText.addDetails("Gravity: " + to_string((int)gravity), "resources/arial.ttf", 15, sf::Color::White, sf::Vector2f(10., 50.));
+	gravityText.addDetails("Gravity: " + to_string((int)gravity), "resources/arial.ttf", 15, sf::Color::White, sf::Vector2f(10., 60.));
 	sizeText.addDetails("Particles: 0", "resources/arial.ttf", 15, sf::Color::White, sf::Vector2f(10., 90.));
 	FPStext.addDetails("FPS: ", "resources/arial.ttf", 15, sf::Color::White, sf::Vector2f(10., 110.));
 	spawnCountText.addDetails("Spawn Count: 100 ", "resources/arial.ttf", 15, sf::Color::White, sf::Vector2f(10., 130.));
+	gravityStatusText.addDetails("Gravity: OFF ", "resources/arial.ttf", 15, sf::Color::White, sf::Vector2f(10., 60.));
+
 	spawnHelpText.addDetails("Increase Spawn-Rate: Up \nDecrease Spawn-Rate: Down ", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 160.));
 	modeHelpText.addDetails("....Modes.... \nMagical: 1\nFree Fall: 2\nConstrained: 3\nWave: 4", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 20.));
 	clearHelpText.addDetails("Clear Particles: C","resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 210.));
@@ -328,6 +339,8 @@ void Game::handleEvents() {
 		
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::G) {
 			toggleGravity = !toggleGravity;
+			if (toggleGravity) gravityStatusText.toString("Gravity: ON");
+			else gravityStatusText.toString("Gravity: OFF");
 		}
 	}
 }
@@ -445,6 +458,10 @@ void Game::render() {
 		window.draw(controlsHelpText.getText());
 		window.draw(helpText.getText());
 		window.draw(gravityHelpText.getText());
+	}
+
+	if (type != particleType::freeFall) {
+		window.draw(gravityStatusText.getText());
 	}
 		
 		window.draw(HUD);
