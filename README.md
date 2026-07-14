@@ -36,13 +36,17 @@ Explore different particle behaviors ranging from magical motion to fireworks, a
 - Manual particle clearing
 - Interactive UI buttons
 
-|Change Modes | Num-1 to Num-6 |
-|Emit Partices | Lctrl |
-|Toggle Gravity (Mode-specific) | G |
-|Increase Spawn Rate | Up |
-|Decrease Spawn Rate | Down |
-|Clear Particles | C |
-|Toggle Color Palette | Tab |
+---
+
+|Action|Key|
+|------------|
+|Change Modes|Num-1 to Num-6|
+|Emit Partices| Lctrl|
+|Toggle Gravity (Mode-specific)|G|
+|Increase Spawn Rate|Up|
+|Decrease Spawn Rate|Down|
+|Clear Particles|C|
+|Toggle Color Palette|Tab|
 
 ---
 
