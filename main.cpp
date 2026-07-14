@@ -378,7 +378,7 @@ void Game::handleEvents() {
 			window.close();
 		}
 
-		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::LControl) {
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::LControl && type != particleType::about) {
 
 			isEmitting = true;
 
