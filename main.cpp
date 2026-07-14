@@ -13,7 +13,8 @@ enum class particleType {
 	magical,
 	freeFall,
 	constrained,
-	wave
+	wave,
+	freeze
 };
 
 class Particle {
@@ -41,12 +42,20 @@ public:
 
 Particle::Particle(Text& radiusText, particleType& type) {
 
-	low= 5;
-	high = 6;
-	particleRadius = rand() % high + low;
+	if (type == particleType::freeze) {
+		particleRadius = 1.f;
+		particleShape.setFillColor(sf::Color::Magenta);
+		radiusText.toString("Radius: " + to_string(particleRadius) + " px");
+	}
+	else {
+		low = 5;
+		high = 6;
+		particleRadius = rand() % high + low;
+		radiusText.toString("Radius: " + to_string(low) + " to " + to_string(high + low) + " px");
+	}
+	
 	particleShape.setRadius(particleRadius);
 	velocity = sf::Vector2f(0.f, 0.f);
-	radiusText.toString("Radius: " + to_string(low) + " to " + to_string(high+low) + " px");
 
 	
 }
@@ -122,7 +131,24 @@ void Particle::update(float& deltaTime, float& gravity, particleType& type, bool
 
 		}
 	}
-	particleShape.move(velocity*deltaTime);
+
+	if (type == particleType::freeze) {
+
+		if (lifeTime > 3 && lifeTime < 5) {
+			acceleration = sf::Vector2f((rand() % 2), (rand() % 2));
+			velocity += acceleration;
+			particleShape.move(velocity * deltaTime);
+			//if (velocity.x > 20 || velocity.y > 20) velocity = sf::Vector2f(20., 20.);
+		}
+		else if (lifeTime >= 5) {
+			particleShape.move(0, 0);
+			lifeTime = 0.f;
+		}
+	}
+
+	if (type != particleType::freeze) {
+		particleShape.move(velocity * deltaTime);
+	}
 
 }
 
@@ -227,12 +253,12 @@ Game::Game() : window(sf::VideoMode(800, 600), "Particle Generator") {
 	spawnCountText.addDetails("Spawn Count: 100 ", "resources/arial.ttf", 15, sf::Color::White, sf::Vector2f(10., 130.));
 	gravityStatusText.addDetails("Gravity: OFF ", "resources/arial.ttf", 15, sf::Color::White, sf::Vector2f(10., 60.));
 
-	spawnHelpText.addDetails("Increase Spawn-Rate: Up \nDecrease Spawn-Rate: Down ", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 160.));
-	modeHelpText.addDetails("....Modes.... \nMagical: 1\nFree Fall: 2\nConstrained: 3\nWave: 4", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 20.));
-	clearHelpText.addDetails("Clear Particles: C","resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 210.));
-	controlsHelpText.addDetails("Emit Particles: LCtrl", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 240.));
-	helpText.addDetails("Toggle Help: H", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 270.));
-	gravityHelpText.addDetails("Toggle Gravity: G", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 300.));
+	spawnHelpText.addDetails("Increase Spawn-Rate: Up \nDecrease Spawn-Rate: Down ", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 180.));
+	modeHelpText.addDetails("....Modes.... \nMagical: 1\nFree Fall: 2\nConstrained: 3\nWave: 4\nFreeze: 5", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 20.));
+	clearHelpText.addDetails("Clear Particles: C","resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 230.));
+	controlsHelpText.addDetails("Emit Particles: LCtrl", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 260.));
+	helpText.addDetails("Toggle Help: H", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 290.));
+	gravityHelpText.addDetails("Toggle Gravity: G", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 320.));
 }
 
 void Game::handleEvents() {
@@ -309,6 +335,13 @@ void Game::handleEvents() {
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Num4) {
 			type = particleType::wave;
 			stateText.toString("Mode: Wave");
+			particleVector.clear();
+			sizeText.toString("Particles: " + to_string(particleVector.size()));
+		}
+
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Num5) {
+			type = particleType::freeze;
+			stateText.toString("Mode: Freeze");
 			particleVector.clear();
 			sizeText.toString("Particles: " + to_string(particleVector.size()));
 		}
