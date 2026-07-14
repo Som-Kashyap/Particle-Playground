@@ -21,7 +21,7 @@ enum class particleType {
 class Particle {
 
 public:
-	Particle(Text& radiusText, particleType& type);
+	Particle(Text& radiusText, particleType& type, sf::Color& color);
 	sf::CircleShape particleShape;
 	sf::Vector2f velocity;
 	sf::Vector2f maxVelocity = (sf::Vector2f(800.f, 500.f));
@@ -40,10 +40,10 @@ public:
 	int high;
 
 	void update(float& deltaTime , float& gravity, particleType& type, bool& toggleGravity);
-	void setFireworksColor(sf::Color color);
+	void setFireworksColor(sf::Color& color);
 };
 
-Particle::Particle(Text& radiusText, particleType& type) {
+Particle::Particle(Text& radiusText, particleType& type, sf::Color& color) {
 
 	if (type == particleType::freeze) {
 		particleRadius = 1.f;
@@ -52,7 +52,7 @@ Particle::Particle(Text& radiusText, particleType& type) {
 	}
 	else if (type == particleType::fireworks) {
 		particleRadius = 1;
-		particleShape.setFillColor(sf::Color::Green);
+		setFireworksColor(color);
 		radiusText.toString("Radius: " + to_string(particleRadius) + " px");
 	}
 	else {
@@ -66,6 +66,10 @@ Particle::Particle(Text& radiusText, particleType& type) {
 	velocity = sf::Vector2f(0.f, 0.f);
 
 	
+}
+
+void Particle::setFireworksColor(sf::Color& color) {
+	particleShape.setFillColor(color);
 }
 
 void Particle::update(float& deltaTime, float& gravity, particleType& type, bool& toggleGravity) {
@@ -236,6 +240,8 @@ public:
 	Text helpText;
 	Text gravityHelpText;
 
+	vector<sf::RectangleShape> colorPaletteVector;
+	sf::Color color;
 	sf::RectangleShape colorPalette;
 	sf::RectangleShape BluePalette;
 	sf::RectangleShape RedPalette;
@@ -298,17 +304,21 @@ Game::Game() : window(sf::VideoMode(800, 600), "Particle Generator") {
 	BluePalette.setSize(sf::Vector2f(40., 40.));
 	BluePalette.setFillColor(sf::Color::Blue);
 	BluePalette.setPosition(20., 310.);
+	colorPaletteVector.push_back(BluePalette);
 	RedPalette.setSize(sf::Vector2f(40., 40.));
 	RedPalette.setFillColor(sf::Color::Red);
 	RedPalette.setPosition(20., 360.);
+	colorPaletteVector.push_back(RedPalette);
 	GreenPalette.setSize(sf::Vector2f(40., 40.));
 	GreenPalette.setFillColor(sf::Color::Green);
 	GreenPalette.setPosition(20., 410.);
+	colorPaletteVector.push_back(GreenPalette);
 	GoldPalette.setSize(sf::Vector2f(40., 40.));
 	GoldPalette.setFillColor(sf::Color(239, 191, 4));
 	GoldPalette.setPosition(70., 310.);
+	colorPaletteVector.push_back(GoldPalette);
 
-	window.setMouseCursorVisible(false);
+	window.setMouseCursorVisible(true);
 
 	stateText.addDetails("Mode: Magical","resources/arial.ttf", 15 , sf::Color::White,sf::Vector2f(10., 10.));
 	radiusText.addDetails("Radius: ", "resources/arial.ttf", 15, sf::Color::White, sf::Vector2f(10., 30.));
@@ -341,7 +351,7 @@ void Game::handleEvents() {
 
 			if (type != particleType::freeFall) {
 				for (size_t i = 0; i < spawnCount; i++) {
-					Particle particleOBJ(radiusText, type);
+					Particle particleOBJ(radiusText, type,color);
 					sf::Vector2f mousepos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 					particleOBJ.particleShape.setPosition(mousepos);
 					particleVector.emplace_back(particleOBJ);
@@ -349,7 +359,7 @@ void Game::handleEvents() {
 			}
 
 			else {
-					Particle particleOBJ(radiusText,type);
+					Particle particleOBJ(radiusText,type,color);
 					sf::Vector2f mousepos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 					particleOBJ.particleShape.setPosition(mousepos);
 					particleVector.emplace_back(particleOBJ);
@@ -440,6 +450,18 @@ void Game::handleEvents() {
 			toggleGravity = !toggleGravity;
 			if (toggleGravity) gravityStatusText.toString("Gravity: ON");
 			else gravityStatusText.toString("Gravity: OFF");
+		}
+
+		if (event.type == sf::Event::MouseButtonPressed && type == particleType::fireworks) {
+			sf::Vector2f mousepos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+			for (int i = 0; i < colorPaletteVector.size(); i++) {
+				if (colorPaletteVector[i].getGlobalBounds().contains(mousepos)) {
+					 color = colorPaletteVector[i].getFillColor();
+					for (int i = 0; i < particleVector.size(); i++) {
+						particleVector[i].setFireworksColor(color);
+					}
+				}
+			}
 		}
 	}
 }
