@@ -298,7 +298,15 @@ Game::Game() : window(sf::VideoMode(800, 600), "Particle Generator") {
 	BluePalette.setSize(sf::Vector2f(40., 40.));
 	BluePalette.setFillColor(sf::Color::Blue);
 	BluePalette.setPosition(20., 310.);
-	
+	RedPalette.setSize(sf::Vector2f(40., 40.));
+	RedPalette.setFillColor(sf::Color::Red);
+	RedPalette.setPosition(20., 360.);
+	GreenPalette.setSize(sf::Vector2f(40., 40.));
+	GreenPalette.setFillColor(sf::Color::Green);
+	GreenPalette.setPosition(20., 410.);
+	GoldPalette.setSize(sf::Vector2f(40., 40.));
+	GoldPalette.setFillColor(sf::Color(239, 191, 4));
+	GoldPalette.setPosition(70., 310.);
 
 	window.setMouseCursorVisible(false);
 
@@ -554,6 +562,9 @@ void Game::render() {
 	if (type == particleType::fireworks) {
 		window.draw(colorPalette);
 		window.draw(BluePalette);
+		window.draw(RedPalette);
+		window.draw(GreenPalette);
+		window.draw(GoldPalette);
 	}
 
 	if (type == particleType::magical) {
