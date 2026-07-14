@@ -14,7 +14,8 @@ enum class particleType {
 	freeFall,
 	constrained,
 	wave,
-	freeze
+	freeze,
+	fireworks
 };
 
 class Particle {
@@ -253,12 +254,12 @@ Game::Game() : window(sf::VideoMode(800, 600), "Particle Generator") {
 	spawnCountText.addDetails("Spawn Count: 100 ", "resources/arial.ttf", 15, sf::Color::White, sf::Vector2f(10., 130.));
 	gravityStatusText.addDetails("Gravity: OFF ", "resources/arial.ttf", 15, sf::Color::White, sf::Vector2f(10., 60.));
 
-	spawnHelpText.addDetails("Increase Spawn-Rate: Up \nDecrease Spawn-Rate: Down ", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 180.));
-	modeHelpText.addDetails("....Modes.... \nMagical: 1\nFree Fall: 2\nConstrained: 3\nWave: 4\nFreeze: 5", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 20.));
-	clearHelpText.addDetails("Clear Particles: C","resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 230.));
-	controlsHelpText.addDetails("Emit Particles: LCtrl", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 260.));
-	helpText.addDetails("Toggle Help: H", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 290.));
-	gravityHelpText.addDetails("Toggle Gravity: G", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 320.));
+	spawnHelpText.addDetails("Increase Spawn-Rate: Up \nDecrease Spawn-Rate: Down ", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 200.));
+	modeHelpText.addDetails("....Modes.... \nMagical: 1\nFree Fall: 2\nConstrained: 3\nWave: 4\nFreeze: 5\nFireworks: 6", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 20.));
+	clearHelpText.addDetails("Clear Particles: C","resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 250.));
+	controlsHelpText.addDetails("Emit Particles: LCtrl", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 280.));
+	helpText.addDetails("Toggle Help: H", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 310.));
+	gravityHelpText.addDetails("Toggle Gravity: G", "resources/arial.ttf", 20, sf::Color::White, sf::Vector2f(controlsDisplay.getPosition().x + 20., controlsDisplay.getPosition().y + 340.));
 }
 
 void Game::handleEvents() {
@@ -342,6 +343,13 @@ void Game::handleEvents() {
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Num5) {
 			type = particleType::freeze;
 			stateText.toString("Mode: Freeze");
+			particleVector.clear();
+			sizeText.toString("Particles: " + to_string(particleVector.size()));
+		}
+
+		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Num6) {
+			type = particleType::fireworks;
+			stateText.toString("Mode: Fireworks");
 			particleVector.clear();
 			sizeText.toString("Particles: " + to_string(particleVector.size()));
 		}
