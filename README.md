@@ -30,23 +30,22 @@ Explore different particle behaviors ranging from magical motion to fireworks, a
 - Live particle counter
 - Efficient particle lifetime management
 
-### 🎮Controls
-- Mouse-driven particle interaction
-- Keyboard shortcuts for switching modes
-- Manual particle clearing
-- Interactive UI buttons
+## 🎮 Controls
 
----
-
-|Action|Key|
-|------------|
-|Change Modes|Num-1 to Num-6|
-|Emit Partices| Lctrl|
-|Toggle Gravity (Mode-specific)|G|
-|Increase Spawn Rate|Up|
-|Decrease Spawn Rate|Down|
-|Clear Particles|C|
-|Toggle Color Palette|Tab|
+| Key | Action |
+|-----|--------|
+| Left Click | Emit particles |
+| 1 | Magical Mode |
+| 2 | Free Fall Mode |
+| 3 | Constrained Mode |
+| 4 | Wave Mode |
+| 5 | Freeze Mode |
+| 6 | Fireworks Mode |
+| G | Toggle Gravity |
+| C | Clear Particles |
+| Up / Down | Increase / Decrease Spawn Rate |
+| H | Toggle Controls Panel |
+| Tab | Toggle Color Palette (mode-specific) |
 
 ---
 
