@@ -29,6 +29,7 @@ public:
 	vector<sf::Color>magicalPalette = { sf::Color(224,63,216,rand()%121+50) , sf::Color(255, 192, 203,rand() % 121 + 50) , sf::Color(0, 255, 255,rand() % 121 + 50)};
 	vector<sf::Color>constrainedPalette = { sf::Color(0,0,255,rand() % 121 + 50), sf::Color(173, 216, 230,rand() % 121 + 50), sf::Color(255,255,255,rand() % 121 + 50)};
 	vector<sf::Color>wavePalette = { sf::Color(255, 165, 0,rand() % 121 + 50),sf::Color(255, 255, 0,rand() % 121 + 50),sf::Color(255,0,0,rand() % 121 + 50) };
+	vector<sf::Color>fireworksPalette = { sf::Color::Red, sf::Color::Green, sf::Color::Blue, sf::Color::Magenta };
 
 	float particleRadius;
 	
@@ -49,8 +50,8 @@ Particle::Particle(Text& radiusText, particleType& type) {
 		radiusText.toString("Radius: " + to_string(particleRadius) + " px");
 	}
 	else if (type == particleType::fireworks) {
-		particleRadius = 1.f;
-		particleShape.setFillColor(sf::Color(rand() % 256, rand() % 256, rand() % 256));
+		particleRadius = 1;
+		particleShape.setFillColor(sf::Color::Green);
 		radiusText.toString("Radius: " + to_string(particleRadius) + " px");
 	}
 	else {
@@ -165,8 +166,10 @@ void Particle::update(float& deltaTime, float& gravity, particleType& type, bool
 			color.a = alpha;
 		}
 		else if (lifeTime >= 5 && lifeTime < 6) {
-			particleShape.move(0, 0);
+			//particleShape.move(0, 0);
 			alpha -= deltaTime;
+			velocity.y += (gravity * deltaTime)/5;
+			particleShape.move(velocity * deltaTime);
 		}
 		else if (lifeTime >= 6) {
 			draw = false;
