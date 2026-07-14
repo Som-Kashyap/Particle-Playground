@@ -49,7 +49,30 @@ Explore different particle behaviors ranging from magical motion to fireworks, a
 
 ---
 
-## How to Run?
+## ▶️ How to Run
+
+### Prerequisites
+
+- Visual Studio 2022
+- Windows
+- C++17 or later
+
+### Steps
+
+1. Clone or download this repository.
+
+```bash
+git clone https://github.com/username/Particle-Playground.git
+```
+2. Copy the dlls and the src files next to the .slnx
+
+3. Open the solution (`.slnx`) in Visual Studio.
+
+4. Build the project.
+
+5. Copy all DLL files from the `DLLs` folder into the same directory as the generated executable (or keep them beside the `.exe` if they are already there).
+
+6. Run the executable (x64/Release).
 
 
 ## 🛠Built with
