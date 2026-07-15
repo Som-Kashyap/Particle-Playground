@@ -1,4 +1,4 @@
-# Particle Playground
+# ✨Particle Playground
 
 A real-time interactive particle playground built with C++ and SFML, featuring multiple particle simulations, customizable visual effects, and interactive controls.  
 
@@ -30,6 +30,10 @@ Explore different particle behaviors ranging from magical motion to fireworks, a
 - Live particle counter
 - Efficient particle lifetime management
 
+## Demo
+<img width="512" height="407" alt="particle-playground" src="https://github.com/user-attachments/assets/092d18f0-3cb0-4d39-8c69-cf13d24f1b4a" />
+
+---
 ## 🎮 Controls
 
 | Key | Action |
